@@ -1,0 +1,138 @@
+{{ define "merchant/login/login.html" }}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商户管理中心 - 登录</title>
+    <!-- Bootstrap 4 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <!-- Font Awesome 5 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
+    <!-- AdminLTE -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/icheck-bootstrap@3.0.1/icheck-bootstrap.min.css">
+    <style>
+        .login-page {
+            background: linear-gradient(135deg, #1b5e20 0%, #43a047 50%, #66bb6a 100%);
+            min-height: 100vh;
+        }
+        .login-box .card {
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            border: none;
+        }
+        .login-box .card-header {
+            background: linear-gradient(135deg, #1b5e20, #43a047);
+            border-radius: 12px 12px 0 0 !important;
+            border-bottom: none;
+            padding: 25px;
+        }
+        .login-box .card-header h3 {
+            color: #fff;
+            font-weight: 700;
+            margin: 0;
+        }
+        .login-box .card-body {
+            padding: 30px;
+        }
+        .login-logo {
+            margin-bottom: 0;
+        }
+        .login-logo b {
+            color: #fff;
+            font-size: 1.8rem;
+        }
+        .captcha-img {
+            cursor: pointer;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            height: 38px;
+        }
+        .btn-login {
+            background: linear-gradient(135deg, #1b5e20, #43a047);
+            border: none;
+            font-weight: 600;
+            padding: 10px;
+            font-size: 1rem;
+        }
+        .btn-login:hover {
+            background: linear-gradient(135deg, #145218, #388e3c);
+        }
+        .input-group-text {
+            background: #f8f9fa;
+            border-right: none;
+        }
+        .form-control.with-icon {
+            border-left: none;
+        }
+    </style>
+</head>
+<body class="hold-transition login-page">
+<div class="login-box">
+    <div class="login-logo mb-3">
+        <b><i class="fas fa-store mr-2"></i>商户管理中心</b>
+    </div>
+    <div class="card card-outline card-success">
+        <div class="card-header text-center">
+            <h3>商户登录</h3>
+        </div>
+        <div class="card-body">
+            <form action="/merchant/doLogin" method="post" id="myform">
+                <input type="hidden" name="captchaId" id="captchaId">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                    </div>
+                    <input type="text" name="username" id="username" class="form-control with-icon" placeholder="商户账号" required autofocus>
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                    </div>
+                    <input type="password" name="password" id="password" class="form-control with-icon" placeholder="商户密码" required>
+                </div>
+                <div class="input-group mb-4">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-shield-alt"></i></span>
+                    </div>
+                    <input type="text" name="verifyValue" id="verify" class="form-control with-icon" placeholder="验证码" required>
+                    <div class="input-group-append">
+                        <img id="captchaImg" src="" class="captcha-img" alt="验证码" title="点击刷新">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-success btn-block btn-login">
+                            <i class="fas fa-sign-in-alt mr-1"></i> 登 录
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+$(function(){
+    getCaptcha()
+    captchaImgChange()
+})
+function getCaptcha(){
+    $.get("/merchant/captcha?t="+Math.random(),function(response){
+        $("#captchaId").val(response.captchaId)
+        $("#captchaImg").attr("src",response.captchaImage)
+    })
+}
+function captchaImgChange(){
+    $("#captchaImg").click(function(){
+        getCaptcha()
+    })
+}
+</script>
+</body>
+</html>
+{{end}}

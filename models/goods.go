@@ -28,6 +28,7 @@ type Goods struct {
 	Sort          int
 	Status        int
 	AddTime       int
+	MerchantId    int // 商户ID，0表示平台商品
 }
 
 func (Goods) TableName() string {

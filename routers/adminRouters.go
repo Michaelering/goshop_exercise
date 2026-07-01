@@ -66,12 +66,12 @@ func AdminRoutersInit(r *gin.Engine) {
 		adminRouters.POST("/goodsType/doEdit", admin.GoodsTypeController{}.DoEdit)
 		adminRouters.GET("/goodsType/delete", admin.GoodsTypeController{}.Delete)
 
-		adminRouters.GET("/goodsTypeAttribute", admin.GoodsTypeAttributeController{}.Index)
-		adminRouters.GET("/goodsTypeAttribute/add", admin.GoodsTypeAttributeController{}.Add)
-		adminRouters.POST("/goodsTypeAttribute/doAdd", admin.GoodsTypeAttributeController{}.DoAdd)
-		adminRouters.GET("/goodsTypeAttribute/edit", admin.GoodsTypeAttributeController{}.Edit)
-		adminRouters.POST("/goodsTypeAttribute/doEdit", admin.GoodsTypeAttributeController{}.DoEdit)
-		adminRouters.GET("/goodsTypeAttribute/delete", admin.GoodsTypeAttributeController{}.Delete)
+		adminRouters.GET("/goodsTypeAttribute", admin.GoodsTypeController{}.Index)
+		adminRouters.GET("/goodsTypeAttribute/add", admin.GoodsTypeController{}.Add)
+		adminRouters.POST("/goodsTypeAttribute/doAdd", admin.GoodsTypeController{}.DoAdd)
+		adminRouters.GET("/goodsTypeAttribute/edit", admin.GoodsTypeController{}.Edit)
+		adminRouters.POST("/goodsTypeAttribute/doEdit", admin.GoodsTypeController{}.DoEdit)
+		adminRouters.GET("/goodsTypeAttribute/delete", admin.GoodsTypeController{}.Delete)
 
 		adminRouters.GET("/goods", admin.GoodsController{}.Index)
 		adminRouters.GET("/goods/add", admin.GoodsController{}.Add)
@@ -95,5 +95,12 @@ func AdminRoutersInit(r *gin.Engine) {
 
 		adminRouters.GET("/setting", admin.SettingController{}.Index)
 		adminRouters.POST("/setting/doEdit", admin.SettingController{}.DoEdit)
+
+		adminRouters.GET("/merchant", admin.MerchantAdminController{}.Index)
+		adminRouters.GET("/merchant/add", admin.MerchantAdminController{}.Add)
+		adminRouters.POST("/merchant/doAdd", admin.MerchantAdminController{}.DoAdd)
+		adminRouters.GET("/merchant/edit", admin.MerchantAdminController{}.Edit)
+		adminRouters.POST("/merchant/doEdit", admin.MerchantAdminController{}.DoEdit)
+		adminRouters.GET("/merchant/delete", admin.MerchantAdminController{}.Delete)
 	}
 }
