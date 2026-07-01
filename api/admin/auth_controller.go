@@ -4,7 +4,6 @@ import (
 	"ginshop58/api/common"
 	"ginshop58/models"
 
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -57,14 +56,6 @@ func (con AuthController) Login(c *gin.Context) {
 		return
 	}
 
-	// 同时也写入 session 以兼容旧的后台页面
-	session := sessions.Default(c)
-	sessionData, _ := models.JsonEncode(managerList)
-	if sessionData != "" {
-		session.Set("userinfo", sessionData)
-		session.Save()
-	}
-
 	common.Success(c, gin.H{
 		"token":      token,
 		"userId":     manager.Id,
@@ -75,9 +66,6 @@ func (con AuthController) Login(c *gin.Context) {
 }
 
 func (con AuthController) Logout(c *gin.Context) {
-	session := sessions.Default(c)
-	session.Delete("userinfo")
-	session.Save()
 	common.Success(c, nil)
 }
 
@@ -103,11 +91,3 @@ func (con AuthController) CurrentUser(c *gin.Context) {
 		"roleTitle": roleTitle,
 	})
 }
-
-// 用于 JSON 序列化辅助（给 models 包加一个 JsonEncode 方法）
-func init() {
-	// 注册 JsonEncode 到 models 包（在 models/tools.go 中已存在类似功能）
-}
-
-// 注意：这里用到的 models.JsonEncode 需要补充，如果 models 中没有的话
-// 使用 encoding/json 替代

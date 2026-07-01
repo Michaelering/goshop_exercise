@@ -19,10 +19,14 @@
           <el-icon><Odometer /></el-icon>
           <template #title>店铺仪表盘</template>
         </el-menu-item>
-        <el-menu-item index="/merchant/goods">
-          <el-icon><Goods /></el-icon>
-          <template #title>商品管理</template>
-        </el-menu-item>
+        <el-sub-menu index="goods-sub">
+          <template #title>
+            <el-icon><Goods /></el-icon>
+            <span>商品管理</span>
+          </template>
+          <el-menu-item index="/merchant/goods">商品列表</el-menu-item>
+          <el-menu-item index="/merchant/goods/add">增加商品</el-menu-item>
+        </el-sub-menu>
         <el-menu-item index="/merchant/order">
           <el-icon><List /></el-icon>
           <template #title>订单管理</template>

@@ -4,7 +4,6 @@ import (
 	"ginshop58/api/common"
 	"ginshop58/models"
 
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -38,14 +37,6 @@ func (con AuthController) Login(c *gin.Context) {
 		return
 	}
 
-	// 同步写入 session 兼容旧商户页面
-	session := sessions.Default(c)
-	sessionData, _ := models.JsonEncode(merchantList)
-	if sessionData != "" {
-		session.Set("merchantInfo", sessionData)
-		session.Save()
-	}
-
 	common.Success(c, gin.H{
 		"token":    token,
 		"userId":   merchant.Id,
@@ -55,9 +46,6 @@ func (con AuthController) Login(c *gin.Context) {
 }
 
 func (con AuthController) Logout(c *gin.Context) {
-	session := sessions.Default(c)
-	session.Delete("merchantInfo")
-	session.Save()
 	common.Success(c, nil)
 }
 

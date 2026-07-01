@@ -1,44 +1,43 @@
 package main
 
 import (
-	"ginshop58/models"
 	"ginshop58/routers"
-	"html/template"
+	"net/http"
+	"os"
+	"path/filepath"
 
 	"github.com/gin-contrib/cors"
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	// 创建一个默认的路由引擎
 	r := gin.Default()
-	//配置gin允许跨域请求
+
+	// 配置 gin 允许跨域请求
 	r.Use(cors.Default())
-	//自定义模板函数  注意要把这个函数放在加载模板前
-	r.SetFuncMap(template.FuncMap{
-		"UnixToTime": models.UnixToTime,
-		"Str2Html":   models.Str2Html,
-		"FormatImg":  models.FormatImg,
-		"Sub":        models.Sub,
-		"Mul":        models.Mul,
-		"Substr":     models.Substr,
-		"FormatAttr": models.FormatAttr,
-	})
-	//加载模板 放在配置路由前面
-	r.LoadHTMLGlob("templates/**/**/*")
-	//配置静态web目录   第一个参数表示路由, 第二个参数表示映射的目录
-	r.Static("/static", "./static")
 
-	// 创建基于 cookie 的存储引擎，secret11111 参数是用于加密的密钥
-	store := cookie.NewStore([]byte("secret111"))
-	//配置session的中间件 store是前面创建的存储引擎，我们可以替换成其他存储引擎
-	r.Use(sessions.Sessions("mysession", store))
+	// 配置静态文件服务 - 仅保留 upload 目录（本地图片上传）
+	r.Static("/static/upload", "./static/upload")
 
-	routers.AdminRoutersInit(r)
-	routers.MerchantRoutersInit(r)
+	// 注册 API 路由
 	routers.ApiRoutersInit(r)
+
+	// 生产环境：服务 Vue SPA 构建产物
+	distPath := "./admin_frontend/dist"
+	if _, err := os.Stat(distPath); err == nil {
+		// 服务 assets 目录（JS/CSS）
+		r.Static("/assets", filepath.Join(distPath, "assets"))
+		// 服务 favicon
+		r.StaticFile("/favicon.ico", filepath.Join(distPath, "favicon.ico"))
+		// SPA 回退：所有非 API 的 GET 请求返回 index.html
+		r.NoRoute(func(c *gin.Context) {
+			if c.Request.Method == "GET" {
+				c.File(filepath.Join(distPath, "index.html"))
+			} else {
+				c.JSON(http.StatusNotFound, gin.H{"code": 404, "message": "not found"})
+			}
+		})
+	}
 
 	r.Run()
 }

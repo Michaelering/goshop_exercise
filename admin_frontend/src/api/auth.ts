@@ -17,10 +17,10 @@ export interface LoginResult {
 }
 
 // 构建 form-urlencoded 请求体（后端使用 c.PostForm 解析）
-function toFormData(data: Record<string, string>): URLSearchParams {
+function toFormData(data: Record<string, any>): URLSearchParams {
   const params = new URLSearchParams()
   for (const [key, value] of Object.entries(data)) {
-    params.append(key, value)
+    params.append(key, String(value ?? ''))
   }
   return params
 }

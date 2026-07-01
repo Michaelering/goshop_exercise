@@ -40,6 +40,16 @@
           <el-menu-item index="/admin/role/add">增加角色</el-menu-item>
         </el-sub-menu>
 
+        <!-- 权限管理 -->
+        <el-sub-menu index="access-sub">
+          <template #title>
+            <el-icon><Lock /></el-icon>
+            <span>权限管理</span>
+          </template>
+          <el-menu-item index="/admin/access">权限列表</el-menu-item>
+          <el-menu-item index="/admin/access/add">增加权限</el-menu-item>
+        </el-sub-menu>
+
         <!-- 商品管理 -->
         <el-sub-menu index="goods-sub">
           <template #title>
@@ -47,6 +57,73 @@
             <span>商品管理</span>
           </template>
           <el-menu-item index="/admin/goods">商品列表</el-menu-item>
+          <el-menu-item index="/admin/goods/add">增加商品</el-menu-item>
+        </el-sub-menu>
+
+        <!-- 商品分类 -->
+        <el-sub-menu index="goodsCate-sub">
+          <template #title>
+            <el-icon><Collection /></el-icon>
+            <span>商品分类</span>
+          </template>
+          <el-menu-item index="/admin/goodsCate">分类列表</el-menu-item>
+          <el-menu-item index="/admin/goodsCate/add">增加分类</el-menu-item>
+        </el-sub-menu>
+
+        <!-- 商品类型 -->
+        <el-sub-menu index="goodsType-sub">
+          <template #title>
+            <el-icon><Tickets /></el-icon>
+            <span>商品类型</span>
+          </template>
+          <el-menu-item index="/admin/goodsType">类型列表</el-menu-item>
+          <el-menu-item index="/admin/goodsType/add">增加类型</el-menu-item>
+        </el-sub-menu>
+
+        <!-- 商品类型属性 -->
+        <el-sub-menu index="goodsTypeAttr-sub">
+          <template #title>
+            <el-icon><List /></el-icon>
+            <span>类型属性</span>
+          </template>
+          <el-menu-item index="/admin/goodsTypeAttr">属性列表</el-menu-item>
+          <el-menu-item index="/admin/goodsTypeAttr/add">增加属性</el-menu-item>
+        </el-sub-menu>
+
+        <!-- 导航管理 -->
+        <el-sub-menu index="nav-sub">
+          <template #title>
+            <el-icon><Guide /></el-icon>
+            <span>导航管理</span>
+          </template>
+          <el-menu-item index="/admin/nav">导航列表</el-menu-item>
+          <el-menu-item index="/admin/nav/add">增加导航</el-menu-item>
+        </el-sub-menu>
+
+        <!-- 轮播图管理 -->
+        <el-sub-menu index="focus-sub">
+          <template #title>
+            <el-icon><PictureFilled /></el-icon>
+            <span>轮播图管理</span>
+          </template>
+          <el-menu-item index="/admin/focus">轮播图列表</el-menu-item>
+          <el-menu-item index="/admin/focus/add">增加轮播图</el-menu-item>
+        </el-sub-menu>
+
+        <!-- 系统设置 -->
+        <el-menu-item index="/admin/setting">
+          <el-icon><Tools /></el-icon>
+          <template #title>系统设置</template>
+        </el-menu-item>
+
+        <!-- 商户管理 -->
+        <el-sub-menu index="merchant-sub">
+          <template #title>
+            <el-icon><Shop /></el-icon>
+            <span>商户管理</span>
+          </template>
+          <el-menu-item index="/admin/merchant">商户列表</el-menu-item>
+          <el-menu-item index="/admin/merchant/add">增加商户</el-menu-item>
         </el-sub-menu>
       </el-menu>
     </el-aside>
@@ -93,7 +170,7 @@
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { Fold, Expand, Odometer, User, Setting, Goods, SwitchButton } from '@element-plus/icons-vue'
+import { Fold, Expand, Odometer, User, Setting, Goods, SwitchButton, Lock, Collection, Tickets, List, Guide, PictureFilled, Tools, Shop } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const router = useRouter()

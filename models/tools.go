@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"html/template"
 	"io"
 	"math/rand"
 	"mime/multipart"
@@ -16,10 +15,14 @@ import (
 	"strings"
 	"time"
 
+	"image"
+	"image/jpeg"
+	"image/png"
+
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"github.com/gin-gonic/gin"
 	"github.com/gomarkdown/markdown"
-	. "github.com/hunterhug/go_image"
+	"golang.org/x/image/draw"
 	"gopkg.in/ini.v1"
 )
 
@@ -66,11 +69,6 @@ func Md5(str string) string {
 	h := md5.New()
 	io.WriteString(h, str)
 	return fmt.Sprintf("%x", h.Sum(nil))
-}
-
-// 把字符串解析成html
-func Str2Html(str string) template.HTML {
-	return template.HTML(str)
 }
 
 // 表示把string转换成int
@@ -279,23 +277,51 @@ func LocalUploadImg(c *gin.Context, picName string) (string, error) {
 
 }
 
-//生成商品缩略图
-
+// 生成商品缩略图
 func ResizeGoodsImage(filename string) {
 	extname := path.Ext(filename)
 	ThumbnailSize := strings.ReplaceAll(GetSettingFromColumn("ThumbnailSize"), "，", ",")
 	thumbnailSizeSlice := strings.Split(ThumbnailSize, ",")
-	//static/upload/tao_400.png
-	//static/upload/tao_400.png_100x100.png
 	for i := 0; i < len(thumbnailSizeSlice); i++ {
 		savepath := filename + "_" + thumbnailSizeSlice[i] + "x" + thumbnailSizeSlice[i] + extname
 		w, _ := Int(thumbnailSizeSlice[i])
-		err := ThumbnailF2F(filename, savepath, w, w)
+		if w <= 0 {
+			continue
+		}
+		// 打开源图
+		srcFile, err := os.Open(filename)
 		if err != nil {
-			fmt.Println(err) //写个日志模块  处理日志
+			fmt.Println(err)
+			continue
+		}
+		srcImg, _, err := image.Decode(srcFile)
+		srcFile.Close()
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+
+		// 缩放
+		dstImg := image.NewRGBA(image.Rect(0, 0, w, w))
+		draw.BiLinear.Scale(dstImg, dstImg.Bounds(), srcImg, srcImg.Bounds(), draw.Over, nil)
+
+		// 保存缩略图
+		dstFile, err := os.Create(savepath)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		ext := strings.ToLower(extname)
+		if ext == ".png" {
+			err = png.Encode(dstFile, dstImg)
+		} else {
+			err = jpeg.Encode(dstFile, dstImg, &jpeg.Options{Quality: 85})
+		}
+		dstFile.Close()
+		if err != nil {
+			fmt.Println(err)
 		}
 	}
-
 }
 
 /*

@@ -4,7 +4,6 @@ import (
 	"ginshop58/api/common"
 	"ginshop58/models"
 
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -126,10 +125,6 @@ func (con DashboardController) ChangeNum(c *gin.Context) {
 
 func (con DashboardController) FlushAll(c *gin.Context) {
 	models.CacheDb.FlushAll()
-
-	// 也清除 session 中的菜单缓存等
-	session := sessions.Default(c)
-	session.Save()
 
 	common.Success(c, nil)
 }

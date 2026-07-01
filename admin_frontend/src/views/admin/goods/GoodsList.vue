@@ -3,6 +3,7 @@
     <template #header>
       <div class="card-header">
         <span>商品列表</span>
+        <el-button type="primary" @click="$router.push('/admin/goods/add')">增加商品</el-button>
       </div>
     </template>
 
@@ -27,9 +28,10 @@
         </template>
       </el-table-column>
       <el-table-column prop="goodsNumber" label="库存" width="80" align="center" />
-      <el-table-column label="操作" width="120" align="center">
+      <el-table-column label="操作" width="180" align="center">
         <template #default="{ row }">
-          <el-button size="small">修改</el-button>
+          <el-button size="small" @click="$router.push(`/admin/goods/edit/${row.id}`)">修改</el-button>
+          <el-button size="small" type="danger" @click="handleDelete(row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -48,7 +50,9 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { ElMessageBox, ElMessage } from 'element-plus'
 import request from '@/api/request'
+import * as api from '@/api/admin'
 
 const list = ref<any[]>([])
 const loading = ref(false)
@@ -66,6 +70,23 @@ async function loadData() {
     total.value = res.total || 0
   } finally {
     loading.value = false
+  }
+}
+
+async function handleDelete(row: any) {
+  try {
+    await ElMessageBox.confirm(`确定要删除商品「${row.title}」吗？`, '删除确认', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    })
+    await api.deleteGoods(row.id)
+    ElMessage.success('删除成功')
+    loadData()
+  } catch (e: any) {
+    if (e !== 'cancel' && e !== 'close') {
+      // error handled by request interceptor
+    }
   }
 }
 

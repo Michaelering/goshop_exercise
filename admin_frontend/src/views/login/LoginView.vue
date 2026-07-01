@@ -40,12 +40,16 @@
           >
             <template #append>
               <img
+                v-if="captchaImg"
                 :src="captchaImg"
                 class="captcha-img"
                 @click="loadCaptcha"
                 alt="验证码"
                 title="点击刷新"
               />
+              <el-button v-else size="small" @click="loadCaptcha" style="height:38px;border:none;border-radius:0;">
+                加载验证码
+              </el-button>
             </template>
           </el-input>
         </el-form-item>
@@ -76,6 +80,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { User, Lock, Key } from '@element-plus/icons-vue'
 import { getCaptcha } from '@/api/auth'
+import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 
 const router = useRouter()
@@ -127,7 +132,7 @@ async function handleLogin() {
     }
   } finally {
     loading.value = false
-    loadCaptcha() // 刷新验证码
+    loadCaptcha()
   }
 }
 
@@ -199,8 +204,3 @@ onMounted(() => {
   font-size: 14px;
 }
 </style>
-
-<script lang="ts">
-import { ElMessage } from 'element-plus'
-export default {}
-</script>
