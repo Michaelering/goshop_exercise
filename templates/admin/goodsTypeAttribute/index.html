@@ -1,0 +1,58 @@
+{{ define "admin/goodsTypeAttribute/index.html" }}
+{{ template "admin/public/page_header.html" .}}
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-list-alt mr-1"></i>类型属性 - {{.goodsType.Title}}</h3>
+        <a href="/admin/goodsTypeAttribute/add?cate_id={{.cateId}}" class="btn btn-primary btn-sm"><i class="fas fa-plus mr-1"></i>增加属性</a>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>属性名称</th>
+                    <th>商品类型</th>
+                    <th>属性值的录入方式</th>
+                    <th>可选值列表</th>
+                    <th>增加时间</th>
+                    <th class="text-center">排序</th>
+                    <th class="text-center">状态</th>
+                    <th class="text-center">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{$cateTitle := .goodsType.Title}}
+                {{range $key,$value := .goodsTypeAttributeList}}
+                <tr>
+                    <td>{{$value.Title}}</td>
+                    <td>{{$cateTitle}}</td>
+                    <td>
+                        {{if eq $value.AttrType 1}}<span class="badge badge-info">单行文本框</span>
+                        {{else if eq $value.AttrType 2}}<span class="badge badge-warning">多行文本框</span>
+                        {{else if eq $value.AttrType 3}}<span class="badge badge-success">select下拉框</span>
+                        {{end}}
+                    </td>
+                    <td>{{$value.AttrValue}}</td>
+                    <td>{{UnixToTime $value.AddTime}}</td>
+                    <td class="text-center">
+                        <span class="chSpanNum" data-id="{{$value.Id}}" data-table="goods_type_attribute" data-field="sort">{{$value.Sort}}</span>
+                    </td>
+                    <td class="text-center">
+                        <label class="status-toggle chStatus" data-id="{{$value.Id}}" data-table="goods_type_attribute" data-field="status">
+                            <input type="checkbox" {{if eq $value.Status 1}}checked{{end}}>
+                            <span class="slider"></span>
+                        </label>
+                    </td>
+                    <td class="text-center">
+                        <a href="/admin/goodsTypeAttribute/edit?id={{$value.Id}}" class="btn btn-info btn-action"><i class="fas fa-edit"></i></a>
+                        <a class="btn btn-danger btn-action delete" href="/admin/goodsTypeAttribute/delete?id={{$value.Id}}&cate_id={{$value.CateId}}"><i class="fas fa-trash"></i></a>
+                    </td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{{ template "admin/public/page_footer.html" .}}
+{{end}}

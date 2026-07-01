@@ -1,0 +1,158 @@
+{{ define "admin/setting/index.html" }}
+{{ template "admin/public/page_header.html" .}}
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-wrench mr-1"></i>系统设置</h3>
+    </div>
+    <div class="card-body">
+        <form action="/admin/setting/doEdit" method="post" enctype="multipart/form-data">
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#general" role="tab" data-toggle="tab"><i class="fas fa-cog mr-1"></i>通用信息</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#oss" role="tab" data-toggle="tab"><i class="fas fa-cloud mr-1"></i>OSS云存储配置</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#thumb" role="tab" data-toggle="tab"><i class="fas fa-image mr-1"></i>缩略图</a>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="general">
+                    <div class="form-group row mt-3">
+                        <label class="col-sm-2 col-form-label text-right">网站标题</label>
+                        <div class="col-sm-6">
+                            <input type="text" name="site_title" class="form-control" value="{{.setting.SiteTitle}}">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label text-right">网站Logo</label>
+                        <div class="col-sm-6">
+                            <div class="custom-file mb-2">
+                                <input type="file" name="site_logo" class="custom-file-input" id="siteLogo">
+                                <label class="custom-file-label" for="siteLogo" data-browse="选择文件">选择图片</label>
+                            </div>
+                            {{if ne .setting.SiteLogo ""}}
+                                <img style="width:80px" class="img-thumbnail" src="{{.setting.SiteLogo | FormatImg}}" />
+                            {{end}}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label text-right">网站关键词</label>
+                        <div class="col-sm-6">
+                            <input type="text" name="site_keywords" class="form-control" value="{{.setting.SiteKeywords}}">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label text-right">网站描述</label>
+                        <div class="col-sm-8">
+                            <textarea name="site_description" class="form-control" rows="3">{{.setting.SiteDescription}}</textarea>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label text-right">商品默认图片</label>
+                        <div class="col-sm-6">
+                            <div class="custom-file mb-2">
+                                <input type="file" name="no_picture" class="custom-file-input" id="noPicture">
+                                <label class="custom-file-label" for="noPicture" data-browse="选择文件">选择图片</label>
+                            </div>
+                            {{if ne .setting.NoPicture ""}}
+                                <img class="img-thumbnail" style="width:80px" src="{{.setting.NoPicture | FormatImg}}" />
+                            {{end}}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label text-right">备案信息</label>
+                        <div class="col-sm-6">
+                            <input type="text" name="site_icp" class="form-control" value="{{.setting.SiteIcp}}">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label text-right">网站电话</label>
+                        <div class="col-sm-6">
+                            <input type="text" name="site_tel" class="form-control" value="{{.setting.SiteTel}}">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label text-right">搜索关键词</label>
+                        <div class="col-sm-6">
+                            <input type="text" name="search_keywords" class="form-control" value="{{.setting.SearchKeywords}}">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label text-right">统计代码</label>
+                        <div class="col-sm-8">
+                            <textarea name="tongji_code" class="form-control" rows="4">{{.setting.TongjiCode}}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div role="tabpanel" class="tab-pane" id="oss">
+                    <div class="alert alert-info mt-3">
+                        <i class="fas fa-info-circle mr-1"></i>是否开启OSS为安全设置，需要在 conf/app.ini 中配置
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label text-right">BucketName</label>
+                        <div class="col-sm-6">
+                            <input type="text" name="bucket_name" class="form-control" value="{{.setting.BucketName}}">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label text-right">Appid</label>
+                        <div class="col-sm-6">
+                            <input type="text" name="appid" class="form-control" value="{{.setting.Appid}}">
+                            <small class="form-text text-muted">请设置为自己的Appid</small>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label text-right">AppSecret</label>
+                        <div class="col-sm-6">
+                            <input type="text" name="app_secret" class="form-control" value="{{.setting.AppSecret}}">
+                            <small class="form-text text-muted">请设置为自己的AppSecret</small>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label text-right">EndPoint</label>
+                        <div class="col-sm-6">
+                            <input type="text" name="end_point" class="form-control" value="{{.setting.EndPoint}}">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label text-right">OSS域名</label>
+                        <div class="col-sm-6">
+                            <input type="text" name="oss_domain" class="form-control" value="{{.setting.OssDomain}}">
+                            <small class="form-text text-muted">域名后面需要加上 /，如：http://www.example.com/</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div role="tabpanel" class="tab-pane" id="thumb">
+                    <div class="form-group row mt-3">
+                        <label class="col-sm-2 col-form-label text-right">缩略图尺寸</label>
+                        <div class="col-sm-6">
+                            <input type="text" name="thumbnail_size" class="form-control" value="{{.setting.ThumbnailSize}}">
+                            <small class="form-text text-muted">如：200,300,400 将生成 200x200、300x300 以及 400x400 的图片</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+            <button type="submit" class="btn btn-success"><i class="fas fa-check mr-1"></i>提交</button>
+        </form>
+    </div>
+</div>
+
+{{ template "admin/public/page_footer.html" .}}
+<script>
+$('.custom-file-input').on('change', function() {
+    var fileName = $(this).val().split('\\').pop();
+    $(this).next('.custom-file-label').html(fileName || '选择文件');
+});
+</script>
+</body>
+</html>
+{{end}}

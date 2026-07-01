@@ -1,0 +1,39 @@
+{{ define "admin/role/auth.html" }}
+{{ template "admin/public/page_header.html" .}}
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-key mr-1"></i>角色授权</h3>
+    </div>
+    <div class="card-body">
+        <form action="/admin/role/doAuth" method="post">
+            <input type="hidden" name="role_id" value="{{.roleId}}" />
+            <table class="table table-bordered">
+                {{range $key,$value := .accessList}}
+                <tr>
+                    <td align="right" style="background:#e9ecef;padding-right:15px;width:160px;font-weight:600;">
+                        <div class="form-check">
+                            <input type="checkbox" {{if eq $value.Checked true}}checked{{end}} class="form-check-input module_cbo" value="{{$value.Id}}" name="access_node[]" id="module_{{$value.Id}}">
+                            <label class="form-check-label" for="module_{{$value.Id}}">{{$value.ModuleName}}</label>
+                        </div>
+                    </td>
+                    <td>
+                        {{range $k,$v := $value.AccessItem}}
+                        <div class="form-check form-check-inline mr-4">
+                            <input type="checkbox" {{if eq $v.Checked true}}checked{{end}} class="form-check-input action_cbo" value="{{$v.Id}}" name="access_node[]" id="action_{{$v.Id}}">
+                            <label class="form-check-label" for="action_{{$v.Id}}">{{$v.ActionName}}</label>
+                        </div>
+                        {{end}}
+                    </td>
+                </tr>
+                {{end}}
+            </table>
+            <hr>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-check mr-1"></i>提交</button>
+            <a href="javascript:history.back()" class="btn btn-default ml-2"><i class="fas fa-arrow-left mr-1"></i>返回</a>
+        </form>
+    </div>
+</div>
+
+{{ template "admin/public/page_footer.html" .}}
+{{end}}

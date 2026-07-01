@@ -1,0 +1,41 @@
+{{ define "admin/manager/index.html" }}
+{{ template "admin/public/page_header.html" .}}
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-user-tie mr-1"></i>管理员列表</h3>
+        <a href="/admin/manager/add" class="btn btn-primary btn-sm"><i class="fas fa-plus mr-1"></i>增加管理员</a>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>管理员名称</th>
+                    <th>管理员电话</th>
+                    <th>管理员邮箱</th>
+                    <th>管理员角色</th>
+                    <th>创建时间</th>
+                    <th class="text-center">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+            {{range $key,$value := .managerList}}
+            <tr>
+                <td>{{$value.Username}}</td>
+                <td>{{$value.Mobile}}</td>
+                <td>{{$value.Email}}</td>
+                <td><span class="badge badge-info">{{$value.Role.Title}}</span></td>
+                <td>{{UnixToTime $value.AddTime}}</td>
+                <td class="text-center">
+                    <a href="/admin/manager/edit?id={{$value.Id}}" class="btn btn-info btn-action"><i class="fas fa-edit mr-1"></i>修改</a>
+                    <a class="btn btn-danger btn-action delete" href="/admin/manager/delete?id={{$value.Id}}"><i class="fas fa-trash mr-1"></i>删除</a>
+                </td>
+            </tr>
+            {{end}}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{{ template "admin/public/page_footer.html" .}}
+{{end}}
