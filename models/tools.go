@@ -2,6 +2,7 @@ package models
 
 import (
 	"crypto/md5"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"html/template"
@@ -344,4 +345,14 @@ func GetOrderId() string {
 	// 2022020312233
 	template := "20060102150405"
 	return time.Now().Format(template) + GetRandomNum()
+}
+
+
+// JsonEncode 将数据编码为 JSON 字符串
+func JsonEncode(data interface{}) (string, error) {
+	bytes, err := json.Marshal(data)
+	if err != nil {
+		return "", err
+	}
+	return string(bytes), nil
 }

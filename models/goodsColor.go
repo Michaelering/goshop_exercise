@@ -1,11 +1,11 @@
 package models
 
 type GoodsColor struct {
-	Id         int
-	ColorName  string
-	ColorValue string
-	Status     int
-	Checked    bool `gorm:"-"` // 忽略本字段
+	Id         int    `json:"id"`
+	ColorName  string `json:"color_name"`
+	ColorValue string `json:"color_value"`
+	Status     int    `json:"status"`
+	Checked    bool   `gorm:"-" json:"checked"` // 忽略本字段
 }
 
 func (GoodsColor) TableName() string {

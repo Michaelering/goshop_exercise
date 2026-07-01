@@ -3,7 +3,14 @@
     "allow": [
       "Bash(go build *)",
       "Bash(go mod *)",
-      "Bash(go vet *)"
+      "Bash(go vet *)",
+      "Bash(mysql *)",
+      "Bash(go run *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8080/merchant/login)",
+      "Bash(curl -s http://localhost:8080/merchant/login)",
+      "Bash(curl -s -o /dev/null -w \"base.css: %{http_code}\" http://localhost:8080/static/admin/css/basic.css)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8080/admin/merchant)",
+      "Bash(kill %1)"
     ]
   }
 }

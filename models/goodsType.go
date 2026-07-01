@@ -1,11 +1,11 @@
 package models
 
 type GoodsType struct {
-	Id          int
-	Title       string
-	Description string
-	Status      int
-	AddTime     int
+	Id          int    `json:"id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Status      int    `json:"status"`
+	AddTime     int    `json:"add_time"`
 }
 
 func (GoodsType) TableName() string {

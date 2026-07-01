@@ -1,28 +1,26 @@
 package models
 
 type Order struct {
-	Id               int
-	OrderId          string
-	Uid              int
-	AllPrice         float64
-	Phone            string
-	Name             string
-	Address          string
-	PayStatus        int // 支付状态： 0 表示未支付     1 已经支付
-	PayType          int // 支付类型： 0 alipay    1 wechat
-	OrderStatus      int // 订单状态： 0 已下单  1 已付款  2 已配货  3、发货   4、交易成功   5、退货   6、取消
-	AddTime          int //下单时间
-	PayTime          int //支付时间
-	DistributionTime int //配货时间
-	ExwarehouseTime  int //出库时间
-	SuccessfulTime   int //交易成功时间
-	CancelTime       int //取消时间
-	ReturnTime       int //退款时间
-	LogisticsCompany int //物流公司
-	WaybillNo        int //运单号
-	//其他的字段
-
-	OrderItem []OrderItem `gorm:"foreignKey:OrderId;references:Id"`
+	Id               int         `json:"id"`
+	OrderId          string      `json:"order_id"`
+	Uid              int         `json:"uid"`
+	AllPrice         float64     `json:"all_price"`
+	Phone            string      `json:"phone"`
+	Name             string      `json:"name"`
+	Address          string      `json:"address"`
+	PayStatus        int         `json:"pay_status"`   // 支付状态： 0 表示未支付     1 已经支付
+	PayType          int         `json:"pay_type"`     // 支付类型： 0 alipay    1 wechat
+	OrderStatus      int         `json:"order_status"` // 订单状态： 0 已下单  1 已付款  2 已配货  3、发货   4、交易成功   5、退货   6、取消
+	AddTime          int         `json:"add_time"`
+	PayTime          int         `json:"pay_time"`
+	DistributionTime int         `json:"distribution_time"`
+	ExwarehouseTime  int         `json:"exwarehouse_time"`
+	SuccessfulTime   int         `json:"successful_time"`
+	CancelTime       int         `json:"cancel_time"`
+	ReturnTime       int         `json:"return_time"`
+	LogisticsCompany int         `json:"logistics_company"`
+	WaybillNo        int         `json:"waybill_no"`
+	OrderItem        []OrderItem `gorm:"foreignKey:OrderId;references:Id" json:"order_item"`
 }
 
 func (Order) TableName() string {

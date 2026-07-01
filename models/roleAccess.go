@@ -1,8 +1,8 @@
 package models
 
 type RoleAccess struct {
-	AccessId int
-	RoleId   int
+	AccessId int `json:"access_id"`
+	RoleId   int `json:"role_id"`
 }
 
 func (RoleAccess) TableName() string {

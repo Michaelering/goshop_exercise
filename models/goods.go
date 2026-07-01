@@ -1,34 +1,34 @@
 package models
 
 type Goods struct {
-	Id            int
-	Title         string
-	SubTitle      string
-	GoodsSn       string
-	CateId        int
-	ClickCount    int
-	GoodsNumber   int
-	Price         float64
-	MarketPrice   float64
-	RelationGoods string
-	GoodsAttr     string
-	GoodsVersion  string
-	GoodsImg      string
-	GoodsGift     string
-	GoodsFitting  string
-	GoodsColor    string
-	GoodsKeywords string
-	GoodsDesc     string
-	GoodsContent  string
-	IsDelete      int
-	IsHot         int
-	IsBest        int
-	IsNew         int
-	GoodsTypeId   int
-	Sort          int
-	Status        int
-	AddTime       int
-	MerchantId    int // 商户ID，0表示平台商品
+	Id            int     `json:"id"`
+	Title         string  `json:"title"`
+	SubTitle      string  `json:"sub_title"`
+	GoodsSn       string  `json:"goods_sn"`
+	CateId        int     `json:"cate_id"`
+	ClickCount    int     `json:"click_count"`
+	GoodsNumber   int     `json:"goods_number"`
+	Price         float64 `json:"price"`
+	MarketPrice   float64 `json:"market_price"`
+	RelationGoods string  `json:"relation_goods"`
+	GoodsAttr     string  `json:"goods_attr"`
+	GoodsVersion  string  `json:"goods_version"`
+	GoodsImg      string  `json:"goods_img"`
+	GoodsGift     string  `json:"goods_gift"`
+	GoodsFitting  string  `json:"goods_fitting"`
+	GoodsColor    string  `json:"goods_color"`
+	GoodsKeywords string  `json:"goods_keywords"`
+	GoodsDesc     string  `json:"goods_desc"`
+	GoodsContent  string  `json:"goods_content"`
+	IsDelete      int     `json:"is_delete"`
+	IsHot         int     `json:"is_hot"`
+	IsBest        int     `json:"is_best"`
+	IsNew         int     `json:"is_new"`
+	GoodsTypeId   int     `json:"goods_type_id"`
+	Sort          int     `json:"sort"`
+	Status        int     `json:"status"`
+	AddTime       int     `json:"add_time"`
+	MerchantId    int     `json:"merchant_id"` // 商户ID，0表示平台商品
 }
 
 func (Goods) TableName() string {

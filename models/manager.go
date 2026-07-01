@@ -1,16 +1,16 @@
 package models
 
 type Manager struct {
-	Id       int
-	Username string
-	Password string
-	Mobile   string
-	Email    string
-	Status   int
-	RoleId   int
-	AddTime  int
-	IsSuper  int
-	Role     Role `gorm:"foreignKey:RoleId;references:Id"`
+	Id       int    `json:"id"`
+	Username string `json:"username"`
+	Password string `json:"-"`
+	Mobile   string `json:"mobile"`
+	Email    string `json:"email"`
+	Status   int    `json:"status"`
+	RoleId   int    `json:"role_id"`
+	AddTime  int    `json:"add_time"`
+	IsSuper  int    `json:"is_super"`
+	Role     Role   `gorm:"foreignKey:RoleId;references:Id" json:"role"`
 }
 
 func (Manager) TableName() string {
