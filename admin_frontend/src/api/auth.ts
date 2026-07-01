@@ -11,8 +11,8 @@ export interface LoginResult {
   token: string
   userId: number
   username: string
-  isSuper?: number
   roleId?: number
+  roleTitle?: string
   shopName?: string
 }
 

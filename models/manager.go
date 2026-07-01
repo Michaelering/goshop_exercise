@@ -9,7 +9,6 @@ type Manager struct {
 	Status   int    `json:"status"`
 	RoleId   int    `json:"role_id"`
 	AddTime  int    `json:"add_time"`
-	IsSuper  int    `json:"is_super"`
 	Role     Role   `gorm:"foreignKey:RoleId;references:Id" json:"role"`
 }
 

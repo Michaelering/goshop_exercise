@@ -120,7 +120,26 @@ func (con ManagerController) Delete(c *gin.Context) {
 		common.BadRequest(c, "参数错误")
 		return
 	}
-	models.DB.Delete(&models.Manager{Id: id})
+
+	// 防自杀：不允许删除自己
+	adminId, _ := c.Get("adminId")
+	if aid, ok := adminId.(int); ok && aid == id {
+		common.BadRequest(c, "不能删除自己的账号")
+		return
+	}
+
+	// 防止删除最后一个超管
+	var superAdminCount int64
+	models.DB.Model(&models.Manager{}).Where("role_id = ? AND status = 1", superAdminRoleId).Count(&superAdminCount)
+
+	targetManager := models.Manager{Id: id}
+	models.DB.Find(&targetManager)
+	if targetManager.RoleId == superAdminRoleId && superAdminCount <= 1 {
+		common.BadRequest(c, "不能删除最后一个超级管理员")
+		return
+	}
+
+	models.DB.Delete(&targetManager)
 	common.Success(c, nil)
 }
 

@@ -11,7 +11,7 @@
       node-key="id"
       default-expand-all
       :default-checked-keys="checkedKeys"
-      :props="{ children: 'access_item', label: 'moduleName' }"
+      :props="{ children: 'children', label: 'module_name' }"
     />
 
     <el-button type="primary" style="margin-top:20px;" :loading="submitting" @click="handleSubmit">
@@ -39,14 +39,15 @@ function collectCheckedKeys(nodes: any[], keys: number[]) {
     if (node.checked) {
       keys.push(node.id)
     }
-    if (node.access_item && node.access_item.length > 0) {
-      collectCheckedKeys(node.access_item, keys)
+    if (node.children && node.children.length > 0) {
+      collectCheckedKeys(node.children, keys)
     }
   }
 }
 
 async function loadData() {
-  const res: any = await api.getRoleAuth(Number(route.params.id))
+  const roleId = Number(route.params.id)
+  const res: any = await api.getRoleAuth(roleId)
   if (res.data) {
     roleTitle.value = res.data.roleTitle || ''
     accessList.value = res.data.accessList || []

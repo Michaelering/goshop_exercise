@@ -1,6 +1,7 @@
 package main
 
 import (
+	"ginshop58/models"
 	"ginshop58/routers"
 	"net/http"
 	"os"
@@ -11,6 +12,9 @@ import (
 )
 
 func main() {
+	// 数据库迁移 + 播种内置角色和权限数据
+	models.RunMigrationAndSeed()
+
 	r := gin.Default()
 
 	// 配置 gin 允许跨域请求

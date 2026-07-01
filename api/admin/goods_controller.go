@@ -148,6 +148,11 @@ func (con GoodsController) Get(c *gin.Context) {
 	})
 }
 
+// 商品状态字段白名单（防止 SQL 注入）
+var allowedGoodsFields = map[string]bool{
+	"status": true, "is_hot": true, "is_best": true, "is_new": true,
+}
+
 func (con GoodsController) ToggleStatus(c *gin.Context) {
 	id, err := models.Int(c.Param("id"))
 	if err != nil {
@@ -158,6 +163,12 @@ func (con GoodsController) ToggleStatus(c *gin.Context) {
 	field := c.PostForm("field")
 	if field == "" {
 		field = "status"
+	}
+
+	// SQL 注入防护：白名单校验
+	if !allowedGoodsFields[field] {
+		common.BadRequest(c, "参数不合法")
+		return
 	}
 
 	err = models.DB.Exec("UPDATE goods SET "+field+"=ABS("+field+"-1) WHERE id=?", id).Error

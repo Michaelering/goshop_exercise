@@ -10,16 +10,18 @@ import (
 	"gopkg.in/ini.v1"
 )
 
-// JWT 自定义 claims
+// AdminClaims 管理员 JWT claims
 type AdminClaims struct {
-	UserId   int    `json:"user_id"`
-	Username string `json:"username"`
-	RoleId   int    `json:"role_id"`
-	IsSuper  int    `json:"is_super"`
-	Type     string `json:"type"` // "admin"
+	UserId    int    `json:"user_id"`
+	Username  string `json:"username"`
+	RoleId    int    `json:"role_id"`
+	RoleTitle string `json:"role_title"` // "超级管理员" | "管理员" | 自定义角色名
+	IsBuiltin int    `json:"is_builtin"` // 1=内置角色
+	Type      string `json:"type"`       // "admin"
 	jwt.RegisteredClaims
 }
 
+// MerchantClaims 商户 JWT claims
 type MerchantClaims struct {
 	UserId   int    `json:"user_id"`
 	Username string `json:"username"`
@@ -28,7 +30,6 @@ type MerchantClaims struct {
 	jwt.RegisteredClaims
 }
 
-// 从配置文件加载 JWT 密钥
 func getJwtSecret() []byte {
 	config, iniErr := ini.Load("./conf/app.ini")
 	if iniErr != nil {
@@ -55,14 +56,15 @@ func getJwtExpireHours() int {
 	return hours
 }
 
-// 生成 Admin JWT
-func GenerateAdminToken(userId int, username string, roleId int, isSuper int) (string, error) {
+// GenerateAdminToken 生成管理员 JWT
+func GenerateAdminToken(userId int, username string, roleId int, roleTitle string, isBuiltin int) (string, error) {
 	claims := AdminClaims{
-		UserId:   userId,
-		Username: username,
-		RoleId:   roleId,
-		IsSuper:  isSuper,
-		Type:     "admin",
+		UserId:    userId,
+		Username:  username,
+		RoleId:    roleId,
+		RoleTitle: roleTitle,
+		IsBuiltin: isBuiltin,
+		Type:      "admin",
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(getJwtExpireHours()) * time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -72,7 +74,7 @@ func GenerateAdminToken(userId int, username string, roleId int, isSuper int) (s
 	return token.SignedString(getJwtSecret())
 }
 
-// 生成 Merchant JWT
+// GenerateMerchantToken 生成商户 JWT
 func GenerateMerchantToken(userId int, username string, shopName string) (string, error) {
 	claims := MerchantClaims{
 		UserId:   userId,
@@ -88,7 +90,7 @@ func GenerateMerchantToken(userId int, username string, shopName string) (string
 	return token.SignedString(getJwtSecret())
 }
 
-// 解析 Admin Token
+// ParseAdminToken 解析管理员 Token
 func ParseAdminToken(tokenString string) (*AdminClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &AdminClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return getJwtSecret(), nil
@@ -105,7 +107,7 @@ func ParseAdminToken(tokenString string) (*AdminClaims, error) {
 	return nil, errors.New("无效的 token")
 }
 
-// 解析 Merchant Token
+// ParseMerchantToken 解析商户 Token
 func ParseMerchantToken(tokenString string) (*MerchantClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &MerchantClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return getJwtSecret(), nil

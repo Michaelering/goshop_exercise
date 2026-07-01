@@ -12,13 +12,13 @@ type AccessController struct{}
 
 func (con AccessController) Index(c *gin.Context) {
 	accessList := []models.Access{}
-	models.DB.Where("module_id=?", 0).Preload("AccessItem").Find(&accessList)
+	models.DB.Where("parent_id=?", 0).Preload("Children").Find(&accessList)
 	common.Success(c, accessList)
 }
 
 func (con AccessController) TopModules(c *gin.Context) {
 	accessList := []models.Access{}
-	models.DB.Where("module_id=?", 0).Find(&accessList)
+	models.DB.Where("parent_id=?", 0).Find(&accessList)
 	common.Success(c, accessList)
 }
 
@@ -26,8 +26,9 @@ func (con AccessController) Create(c *gin.Context) {
 	moduleName := strings.Trim(c.PostForm("module_name"), " ")
 	actionName := c.PostForm("action_name")
 	accessType, _ := models.Int(c.PostForm("type"))
-	url := c.PostForm("url")
-	moduleId, _ := models.Int(c.PostForm("module_id"))
+	urlPrefix := c.PostForm("url_prefix")
+	httpMethods := c.PostForm("http_methods")
+	parentId, _ := models.Int(c.PostForm("parent_id"))
 	sort, _ := models.Int(c.PostForm("sort"))
 	status, _ := models.Int(c.PostForm("status"))
 	description := c.PostForm("description")
@@ -41,8 +42,9 @@ func (con AccessController) Create(c *gin.Context) {
 		ModuleName:  moduleName,
 		Type:        accessType,
 		ActionName:  actionName,
-		Url:         url,
-		ModuleId:    moduleId,
+		UrlPrefix:   urlPrefix,
+		HttpMethods: httpMethods,
+		ParentId:    parentId,
 		Sort:        sort,
 		Description: description,
 		Status:      status,
@@ -66,8 +68,9 @@ func (con AccessController) Update(c *gin.Context) {
 	moduleName := strings.Trim(c.PostForm("module_name"), " ")
 	actionName := c.PostForm("action_name")
 	accessType, _ := models.Int(c.PostForm("type"))
-	url := c.PostForm("url")
-	moduleId, _ := models.Int(c.PostForm("module_id"))
+	urlPrefix := c.PostForm("url_prefix")
+	httpMethods := c.PostForm("http_methods")
+	parentId, _ := models.Int(c.PostForm("parent_id"))
 	sort, _ := models.Int(c.PostForm("sort"))
 	status, _ := models.Int(c.PostForm("status"))
 	description := c.PostForm("description")
@@ -87,8 +90,9 @@ func (con AccessController) Update(c *gin.Context) {
 	access.ModuleName = moduleName
 	access.Type = accessType
 	access.ActionName = actionName
-	access.Url = url
-	access.ModuleId = moduleId
+	access.UrlPrefix = urlPrefix
+	access.HttpMethods = httpMethods
+	access.ParentId = parentId
 	access.Sort = sort
 	access.Description = description
 	access.Status = status
@@ -110,10 +114,10 @@ func (con AccessController) Delete(c *gin.Context) {
 
 	access := models.Access{Id: id}
 	models.DB.Find(&access)
-	if access.ModuleId == 0 {
+	if access.ParentId == 0 {
 		// 顶级模块，检查是否有子节点
 		var childCount int64
-		models.DB.Where("module_id=?", id).Table("access").Count(&childCount)
+		models.DB.Where("parent_id=?", id).Table("access").Count(&childCount)
 		if childCount > 0 {
 			common.BadRequest(c, "当前模块下面有菜单或者操作，请先删除子节点")
 			return
@@ -139,7 +143,7 @@ func (con AccessController) Get(c *gin.Context) {
 
 	// 获取顶级模块供下拉选择
 	accessList := []models.Access{}
-	models.DB.Where("module_id=?", 0).Find(&accessList)
+	models.DB.Where("parent_id=?", 0).Find(&accessList)
 
 	common.Success(c, gin.H{
 		"access":     access,

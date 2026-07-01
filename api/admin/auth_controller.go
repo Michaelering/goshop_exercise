@@ -36,7 +36,7 @@ func (con AuthController) Login(c *gin.Context) {
 
 	managerList := []models.Manager{}
 	password = models.Md5(password)
-	models.DB.Where("username=? AND password=?", username, password).Find(&managerList)
+	models.DB.Where("username=? AND password=?", username, password).Preload("Role").Find(&managerList)
 
 	if len(managerList) == 0 {
 		common.Error(c, 400, "用户名或者密码错误")
@@ -49,19 +49,27 @@ func (con AuthController) Login(c *gin.Context) {
 		return
 	}
 
-	// 生成 JWT
-	token, err := common.GenerateAdminToken(manager.Id, manager.Username, manager.RoleId, manager.IsSuper)
+	// 获取角色信息
+	roleTitle := ""
+	isBuiltin := 0
+	if manager.Role.Id > 0 {
+		roleTitle = manager.Role.Title
+		isBuiltin = manager.Role.IsBuiltin
+	}
+
+	// 生成 JWT（不再使用 is_super，改为角色驱动）
+	token, err := common.GenerateAdminToken(manager.Id, manager.Username, manager.RoleId, roleTitle, isBuiltin)
 	if err != nil {
 		common.Error(c, 500, "生成令牌失败")
 		return
 	}
 
 	common.Success(c, gin.H{
-		"token":      token,
-		"userId":     manager.Id,
-		"username":   manager.Username,
-		"isSuper":    manager.IsSuper,
-		"roleId":     manager.RoleId,
+		"token":     token,
+		"userId":    manager.Id,
+		"username":  manager.Username,
+		"roleId":    manager.RoleId,
+		"roleTitle": roleTitle,
 	})
 }
 
@@ -72,21 +80,12 @@ func (con AuthController) Logout(c *gin.Context) {
 func (con AuthController) CurrentUser(c *gin.Context) {
 	adminId, _ := c.Get("adminId")
 	username, _ := c.Get("username")
-	isSuper, _ := c.Get("isSuper")
 	roleId, _ := c.Get("roleId")
-
-	// 获取角色名称
-	roleTitle := ""
-	if roleIdVal, ok := roleId.(int); ok && roleIdVal != 0 {
-		role := models.Role{Id: roleIdVal}
-		models.DB.Find(&role)
-		roleTitle = role.Title
-	}
+	roleTitle, _ := c.Get("roleTitle")
 
 	common.Success(c, gin.H{
 		"userId":    adminId,
 		"username":  username,
-		"isSuper":   isSuper,
 		"roleId":    roleId,
 		"roleTitle": roleTitle,
 	})

@@ -15,116 +15,35 @@
         active-text-color="#409eff"
         router
       >
-        <el-menu-item index="/admin/dashboard">
-          <el-icon><Odometer /></el-icon>
-          <template #title>仪表盘</template>
-        </el-menu-item>
+        <!-- 动态菜单：从后端 /admin/menu 获取 -->
+        <template v-for="item in menuList" :key="item.id">
+          <!-- 多子菜单 → el-sub-menu -->
+          <el-sub-menu
+            v-if="item.children && item.children.length > 1"
+            :index="item.url_prefix + '-sub'"
+          >
+            <template #title>
+              <el-icon><component :is="getIcon(item.url_prefix)" /></el-icon>
+              <span>{{ item.module_name }}</span>
+            </template>
+            <el-menu-item
+              v-for="child in item.children"
+              :key="child.id"
+              :index="getChildRoute(item.url_prefix, child.action_name)"
+            >
+              {{ child.action_name }}
+            </el-menu-item>
+          </el-sub-menu>
 
-        <!-- 管理员管理 -->
-        <el-sub-menu index="manager-sub">
-          <template #title>
-            <el-icon><User /></el-icon>
-            <span>管理员管理</span>
-          </template>
-          <el-menu-item index="/admin/manager">管理员列表</el-menu-item>
-          <el-menu-item index="/admin/manager/add">增加管理员</el-menu-item>
-        </el-sub-menu>
-
-        <!-- 角色管理 -->
-        <el-sub-menu index="role-sub">
-          <template #title>
-            <el-icon><Setting /></el-icon>
-            <span>角色管理</span>
-          </template>
-          <el-menu-item index="/admin/role">角色列表</el-menu-item>
-          <el-menu-item index="/admin/role/add">增加角色</el-menu-item>
-        </el-sub-menu>
-
-        <!-- 权限管理 -->
-        <el-sub-menu index="access-sub">
-          <template #title>
-            <el-icon><Lock /></el-icon>
-            <span>权限管理</span>
-          </template>
-          <el-menu-item index="/admin/access">权限列表</el-menu-item>
-          <el-menu-item index="/admin/access/add">增加权限</el-menu-item>
-        </el-sub-menu>
-
-        <!-- 商品管理 -->
-        <el-sub-menu index="goods-sub">
-          <template #title>
-            <el-icon><Goods /></el-icon>
-            <span>商品管理</span>
-          </template>
-          <el-menu-item index="/admin/goods">商品列表</el-menu-item>
-          <el-menu-item index="/admin/goods/add">增加商品</el-menu-item>
-        </el-sub-menu>
-
-        <!-- 商品分类 -->
-        <el-sub-menu index="goodsCate-sub">
-          <template #title>
-            <el-icon><Collection /></el-icon>
-            <span>商品分类</span>
-          </template>
-          <el-menu-item index="/admin/goodsCate">分类列表</el-menu-item>
-          <el-menu-item index="/admin/goodsCate/add">增加分类</el-menu-item>
-        </el-sub-menu>
-
-        <!-- 商品类型 -->
-        <el-sub-menu index="goodsType-sub">
-          <template #title>
-            <el-icon><Tickets /></el-icon>
-            <span>商品类型</span>
-          </template>
-          <el-menu-item index="/admin/goodsType">类型列表</el-menu-item>
-          <el-menu-item index="/admin/goodsType/add">增加类型</el-menu-item>
-        </el-sub-menu>
-
-        <!-- 商品类型属性 -->
-        <el-sub-menu index="goodsTypeAttr-sub">
-          <template #title>
-            <el-icon><List /></el-icon>
-            <span>类型属性</span>
-          </template>
-          <el-menu-item index="/admin/goodsTypeAttr">属性列表</el-menu-item>
-          <el-menu-item index="/admin/goodsTypeAttr/add">增加属性</el-menu-item>
-        </el-sub-menu>
-
-        <!-- 导航管理 -->
-        <el-sub-menu index="nav-sub">
-          <template #title>
-            <el-icon><Guide /></el-icon>
-            <span>导航管理</span>
-          </template>
-          <el-menu-item index="/admin/nav">导航列表</el-menu-item>
-          <el-menu-item index="/admin/nav/add">增加导航</el-menu-item>
-        </el-sub-menu>
-
-        <!-- 轮播图管理 -->
-        <el-sub-menu index="focus-sub">
-          <template #title>
-            <el-icon><PictureFilled /></el-icon>
-            <span>轮播图管理</span>
-          </template>
-          <el-menu-item index="/admin/focus">轮播图列表</el-menu-item>
-          <el-menu-item index="/admin/focus/add">增加轮播图</el-menu-item>
-        </el-sub-menu>
-
-        <!-- 系统设置 -->
-        <el-menu-item index="/admin/setting">
-          <el-icon><Tools /></el-icon>
-          <template #title>系统设置</template>
-        </el-menu-item>
-
-        <!-- 商户管理 -->
-        <el-sub-menu index="merchant-sub">
-          <template #title>
-            <el-icon><Shop /></el-icon>
-            <span>商户管理</span>
-          </template>
-          <el-menu-item index="/admin/merchant">商户列表</el-menu-item>
-          <el-menu-item index="/admin/merchant/add">增加商户</el-menu-item>
-        </el-sub-menu>
+          <!-- 0-1 个子菜单 → 直接渲染为菜单项（点击进入列表页） -->
+          <el-menu-item
+            v-else
+            :index="getChildRoute(item.url_prefix, item.children?.[0]?.action_name || '')"
+          >
+            <el-icon><component :is="getIcon(item.url_prefix)" /></el-icon>
+            <template #title>{{ item.module_name }}</template>
+          </el-menu-item>
+        </template>
       </el-menu>
     </el-aside>
 
@@ -146,6 +65,9 @@
             <span class="user-info">
               <el-icon><User /></el-icon>
               {{ authStore.user?.username || '管理员' }}
+              <el-tag v-if="authStore.user?.roleTitle" size="small" type="warning" style="margin-left:6px">
+                {{ authStore.user.roleTitle }}
+              </el-tag>
             </span>
             <template #dropdown>
               <el-dropdown-menu>
@@ -167,18 +89,74 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { Fold, Expand, Odometer, User, Setting, Goods, SwitchButton, Lock, Collection, Tickets, List, Guide, PictureFilled, Tools, Shop } from '@element-plus/icons-vue'
+import { getToken } from '@/utils/token'
+import request from '@/api/request'
+import {
+  Fold, Expand, Odometer, User, Setting, Goods, SwitchButton,
+  Lock, Collection, Tickets, List, Guide, PictureFilled, Tools, Shop, Menu, Loading
+} from '@element-plus/icons-vue'
 
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 
 const isCollapse = ref(false)
+const menuList = ref<any[]>([])
 
 const activeMenu = computed(() => route.path)
+
+// 图标映射：url_prefix → Element Plus icon component
+const iconMap: Record<string, any> = {
+  dashboard: Odometer,
+  manager: User,
+  role: Setting,
+  access: Lock,
+  goods: Goods,
+  goodsCate: Collection,
+  goodsType: Tickets,
+  goodsTypeAttr: List,
+  nav: Guide,
+  focus: PictureFilled,
+  setting: Tools,
+  merchant: Shop,
+}
+
+function getIcon(prefix: string) {
+  return iconMap[prefix] || Menu
+}
+
+// 根据子菜单决定路由目标
+function getChildRoute(parentPrefix: string, actionName: string): string {
+  // 0 或 1 个子菜单 → 直接进入列表页
+  if (!actionName) {
+    return '/admin/' + parentPrefix
+  }
+  // 如"增加角色" → /admin/role/add
+  if (actionName.includes('增加')) {
+    return '/admin/' + parentPrefix + '/add'
+  }
+  // 默认列表页
+  return '/admin/' + parentPrefix
+}
+
+async function loadMenu() {
+  try {
+    const res: any = await request.get('/admin/menu')
+    if (res && res.data) {
+      menuList.value = res.data
+    }
+  } catch (e) {
+    console.error('加载菜单失败:', e)
+  }
+}
+
+// 当 token 发生变化时重新加载菜单（处理登录后首次挂载）
+watch(() => authStore.isLoggedIn, (val) => {
+  if (val) loadMenu()
+})
 
 function toggleCollapse() {
   isCollapse.value = !isCollapse.value
@@ -188,6 +166,13 @@ function handleLogout() {
   authStore.logout()
   router.push('/login')
 }
+
+onMounted(() => {
+  // 仅在已登录状态下加载菜单
+  if (getToken()) {
+    loadMenu()
+  }
+})
 </script>
 
 <style scoped>

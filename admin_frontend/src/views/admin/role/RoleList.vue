@@ -8,17 +8,30 @@
     </template>
 
     <el-table :data="list" stripe v-loading="loading">
-      <el-table-column prop="title" label="角色名称" />
+      <el-table-column prop="title" label="角色名称">
+        <template #default="{ row }">
+          {{ row.title }}
+          <el-tag v-if="row.isBuiltin === 1" size="small" type="warning" style="margin-left:8px">内置</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column prop="description" label="描述" />
       <el-table-column label="创建时间">
         <template #default="{ row }">
           {{ formatTime(row.addTime) }}
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="250" align="center">
+      <el-table-column label="操作" width="280" align="center">
         <template #default="{ row }">
           <el-button size="small" @click="$router.push('/admin/role/edit/' + row.id)">修改</el-button>
-          <el-button size="small" type="danger" @click="handleDelete(row.id)">删除</el-button>
+          <el-button size="small" type="warning" @click="$router.push('/admin/role/auth/' + row.id)">授权</el-button>
+          <el-button
+            size="small"
+            type="danger"
+            :disabled="row.isBuiltin === 1"
+            @click="handleDelete(row.id)"
+          >
+            删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
