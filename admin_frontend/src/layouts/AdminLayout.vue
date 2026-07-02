@@ -94,9 +94,10 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { getToken } from '@/utils/token'
 import request from '@/api/request'
+import { adminLogout } from '@/api/auth'
 import {
   Fold, Expand, Odometer, User, Setting, Goods, SwitchButton,
-  Lock, Collection, Tickets, List, Guide, PictureFilled, Tools, Shop, Menu, Loading
+  Lock, Collection, Tickets, List, Guide, PictureFilled, Tools, Shop, Menu
 } from '@element-plus/icons-vue'
 
 const route = useRoute()
@@ -163,6 +164,7 @@ function toggleCollapse() {
 }
 
 function handleLogout() {
+  adminLogout().finally(() => {})
   authStore.logout()
   router.push('/login')
 }

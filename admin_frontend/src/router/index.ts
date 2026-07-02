@@ -1,6 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
-import { getToken } from '@/utils/token'
+import { getToken, getUserType } from '@/utils/token'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -22,7 +22,6 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/admin/dashboard/DashboardView.vue'),
         meta: { title: '仪表盘' },
       },
-      // 管理员管理
       {
         path: 'manager',
         name: 'AdminManager',
@@ -41,7 +40,6 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/admin/manager/ManagerForm.vue'),
         meta: { title: '修改管理员' },
       },
-      // 角色管理
       {
         path: 'role',
         name: 'AdminRole',
@@ -66,7 +64,6 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/admin/role/RoleAuth.vue'),
         meta: { title: '角色授权' },
       },
-      // 权限管理
       {
         path: 'access',
         name: 'AdminAccess',
@@ -85,7 +82,6 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/admin/access/AccessForm.vue'),
         meta: { title: '修改权限' },
       },
-      // 商品管理
       {
         path: 'goods',
         name: 'AdminGoods',
@@ -104,7 +100,6 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/admin/goods/GoodsForm.vue'),
         meta: { title: '修改商品' },
       },
-      // 商品分类
       {
         path: 'goodsCate',
         name: 'AdminGoodsCate',
@@ -123,7 +118,6 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/admin/goodsCate/GoodsCateForm.vue'),
         meta: { title: '修改分类' },
       },
-      // 商品类型
       {
         path: 'goodsType',
         name: 'AdminGoodsType',
@@ -142,7 +136,6 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/admin/goodsType/GoodsTypeForm.vue'),
         meta: { title: '修改类型' },
       },
-      // 商品类型属性
       {
         path: 'goodsTypeAttr',
         name: 'AdminGoodsTypeAttr',
@@ -161,7 +154,6 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/admin/goodsTypeAttr/GoodsTypeAttrForm.vue'),
         meta: { title: '修改属性' },
       },
-      // 导航管理
       {
         path: 'nav',
         name: 'AdminNav',
@@ -180,7 +172,6 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/admin/nav/NavForm.vue'),
         meta: { title: '修改导航' },
       },
-      // 轮播图管理
       {
         path: 'focus',
         name: 'AdminFocus',
@@ -199,14 +190,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/admin/focus/FocusForm.vue'),
         meta: { title: '修改轮播图' },
       },
-      // 系统设置
       {
         path: 'setting',
         name: 'AdminSetting',
         component: () => import('@/views/admin/setting/SettingForm.vue'),
         meta: { title: '系统设置' },
       },
-      // 商户管理（后台）
       {
         path: 'merchant',
         name: 'AdminMerchant',
@@ -277,19 +266,28 @@ const router = createRouter({
   routes,
 })
 
-// 路由守卫
 router.beforeEach((to, _from, next) => {
   const hasToken = !!getToken()
+  const userType = getUserType()
 
   if (to.meta.requiresAuth) {
+    // 无 token → 登录页
     if (!hasToken) {
       next({ path: '/login' })
-    } else {
-      next()
+      return
     }
+    // 有 token 但角色不匹配 → 重定向到对应首页
+    if (to.meta.role && userType && to.meta.role !== userType) {
+      const targetPath = userType === 'admin' ? '/admin/dashboard' : '/merchant/dashboard'
+      next({ path: targetPath })
+      return
+    }
+    next()
   } else {
+    // 已登录用户访问登录页 → 跳转对应首页
     if (hasToken && to.path === '/login') {
-      next({ path: '/' })
+      const targetPath = userType === 'admin' ? '/admin/dashboard' : '/merchant/dashboard'
+      next({ path: targetPath })
     } else {
       next()
     }

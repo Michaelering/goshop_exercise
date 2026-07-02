@@ -51,14 +51,12 @@ func (con AuthController) Login(c *gin.Context) {
 
 	// 获取角色信息
 	roleTitle := ""
-	isBuiltin := 0
 	if manager.Role.Id > 0 {
 		roleTitle = manager.Role.Title
-		isBuiltin = manager.Role.IsBuiltin
 	}
 
-	// 生成 JWT（不再使用 is_super，改为角色驱动）
-	token, err := common.GenerateAdminToken(manager.Id, manager.Username, manager.RoleId, roleTitle, isBuiltin)
+	// 生成 JWT
+	token, err := common.GenerateAdminToken(manager.Id, manager.Username, manager.RoleId, roleTitle)
 	if err != nil {
 		common.Error(c, 500, "生成令牌失败")
 		return

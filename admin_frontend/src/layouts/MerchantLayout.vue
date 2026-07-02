@@ -72,6 +72,7 @@
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { merchantLogout } from '@/api/auth'
 import { Fold, Expand, Odometer, Goods, List, User, SwitchButton } from '@element-plus/icons-vue'
 
 const route = useRoute()
@@ -86,6 +87,7 @@ function toggleCollapse() {
 }
 
 function handleLogout() {
+  merchantLogout().finally(() => {})
   authStore.logout()
   router.push('/login')
 }

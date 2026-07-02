@@ -50,23 +50,18 @@ func (con DashboardController) Index(c *gin.Context) {
 
 func (con DashboardController) Menu(c *gin.Context) {
 	roleId, _ := c.Get("roleId")
-	isBuiltin, _ := c.Get("isBuiltin")
 
 	accessList := []models.Access{}
 	models.DB.Where("parent_id=?", 0).Preload("Children", func(db *gorm.DB) *gorm.DB {
 		return db.Order("access.sort DESC")
 	}).Order("sort DESC").Find(&accessList)
 
-	// 超级管理员判定：
-	// 1. roleId == 1（超管角色ID）+ is_builtin == 1 → 直接返回全部菜单
-	// 2. roleId == 1 但 is_builtin == 0 → 兼容旧 token，查 DB 确认角色权限
-	// 3. roleId == 0 → 旧 token 可能无 role_id，查 DB 获取真实 roleId
 	effectiveRoleId := 0
 	if rid, ok := roleId.(int); ok && rid > 0 {
 		effectiveRoleId = rid
 	}
 
-	// 兼容：token 中 roleId 可能为 0（旧 is_super 用户），从 DB 重新查询
+	// 兼容旧 token 中 roleId 可能为 0
 	if effectiveRoleId == 0 {
 		adminId, _ := c.Get("adminId")
 		if aid, ok := adminId.(int); ok && aid > 0 {
@@ -78,16 +73,8 @@ func (con DashboardController) Menu(c *gin.Context) {
 		}
 	}
 
-	// 查询角色是否为超管
-	isSuperAdmin := false
+	// roleId=1 为超级管理员 → 返回全部菜单
 	if effectiveRoleId == superAdminRoleId {
-		// roleId=1 就是超管角色，不论 isBuiltin
-		isSuperAdmin = true
-	} else if builtinVal, ok := isBuiltin.(int); ok && builtinVal == 1 && effectiveRoleId == superAdminRoleId {
-		isSuperAdmin = true
-	}
-
-	if isSuperAdmin {
 		common.Success(c, accessList)
 		return
 	}

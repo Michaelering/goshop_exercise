@@ -138,6 +138,8 @@ async function handleLogin() {
 
 function toggleMode() {
   isMerchant.value = !isMerchant.value
+  form.username = ''
+  form.password = ''
   form.verifyValue = ''
   loadCaptcha()
 }

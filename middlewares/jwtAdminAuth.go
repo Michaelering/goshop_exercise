@@ -56,8 +56,6 @@ func JwtAdminAuthMiddleware(c *gin.Context) {
 	c.Set("username", claims.Username)
 	c.Set("roleId", claims.RoleId)
 	c.Set("roleTitle", claims.RoleTitle)
-	c.Set("isBuiltin", claims.IsBuiltin)
-
 	// 4. 获取有效的 roleId（兼容旧 token 中 roleId=0 的情况）
 	effectiveRoleId := claims.RoleId
 	if effectiveRoleId == 0 && claims.UserId > 0 {

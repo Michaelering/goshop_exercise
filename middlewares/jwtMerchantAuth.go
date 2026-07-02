@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"ginshop58/api/common"
-	"ginshop58/models"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -31,16 +30,7 @@ func JwtMerchantAuthMiddleware(c *gin.Context) {
 		return
 	}
 
-	// 验证商户状态是否正常
-	merchant := models.Merchant{Id: claims.UserId}
-	models.DB.Find(&merchant)
-	if merchant.Status != 1 {
-		common.Forbidden(c, "商户已被禁用")
-		c.Abort()
-		return
-	}
-
-	// 将商户信息存入 context
+	// 将商户信息存入 context（不再每请求查 DB）
 	c.Set("merchantId", claims.UserId)
 	c.Set("username", claims.Username)
 	c.Set("shopName", claims.ShopName)

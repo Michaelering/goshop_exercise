@@ -65,6 +65,9 @@ func runMigration() {
 
 	fmt.Println("数据库迁移完成")
 
+	// 修复旧自定义角色：给有管理员引用但无权限的自定义角色分配管理员权限
+	fixOrphanRoles()
+
 	// 清理不应该有子项的模块（仪表盘、系统设置只有一个子菜单，冗余）
 	cleanupOrphanChildren()
 }
@@ -269,4 +272,33 @@ func seedAdminPermissions() {
 // cleanupOrphanChildren 删除单页模块下不应存在的子菜单（旧种子数据残留）
 func cleanupOrphanChildren() {
 	DB.Exec("DELETE FROM access WHERE type = 2 AND parent_id IN (SELECT id FROM (SELECT id FROM access WHERE url_prefix IN ('dashboard','setting') AND type = 1) AS tmp)")
+}
+
+// fixOrphanRoles 给旧自定义角色（有管理员在使用但无任何权限）自动分配管理员权限
+func fixOrphanRoles() {
+	// 找出所有被 manager 引用的角色
+	rows, err := DB.Raw("SELECT DISTINCT role_id FROM manager WHERE role_id > 0 AND role_id NOT IN (1, 2)").Rows()
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+
+	adminPrefixes := []string{"dashboard", "goods", "goodsCate", "goodsType", "goodsTypeAttr", "nav", "focus", "setting", "merchant"}
+	for rows.Next() {
+		var roleId int
+		rows.Scan(&roleId)
+		// 检查此角色是否有任何权限
+		var accessCount int64
+		DB.Model(&RoleAccess{}).Where("role_id = ?", roleId).Count(&accessCount)
+		if accessCount == 0 {
+			fmt.Printf("修复孤儿角色 id=%d: 自动分配管理员权限\n", roleId)
+			for _, prefix := range adminPrefixes {
+				var access Access
+				DB.Where("url_prefix = ? AND type = 1", prefix).Find(&access)
+				if access.Id > 0 {
+					DB.Create(&RoleAccess{RoleId: roleId, AccessId: access.Id})
+				}
+			}
+		}
+	}
 }

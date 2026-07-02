@@ -36,7 +36,7 @@ request.interceptors.response.use(
       const { status } = error.response
       if (status === 401) {
         removeToken()
-        window.location.href = '/login'
+        window.location.replace('/#/login')
       } else if (status === 403) {
         ElMessage.error('没有权限')
       } else if (status === 500) {
