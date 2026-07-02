@@ -88,6 +88,51 @@ func SeedBuiltinData() {
 	seedBuiltinAccess()
 	seedSuperAdminPermissions()
 	seedAdminPermissions()
+	ensureOrderModule()
+}
+
+// ensureOrderModule 向已有数据库补插入订单模块（用于在不重建种子的情况下加新模块）
+func ensureOrderModule() {
+	var count int64
+	DB.Model(&Access{}).Where("url_prefix = ? AND type = 1", "order").Count(&count)
+	if count > 0 {
+		return // 已存在
+	}
+
+	fmt.Println("补种订单管理模块...")
+
+	// 创建订单模块组
+	orderModule := Access{
+		ModuleName:  "订单管理",
+		Type:        1,
+		UrlPrefix:   "order",
+		HttpMethods: "GET,PUT",
+		ParentId:    0,
+		Sort:        25,
+		Status:      1,
+		AddTime:     int(GetUnix()),
+	}
+	DB.Create(&orderModule)
+
+	// 创建子菜单项
+	orderMenu := Access{
+		ModuleName: "订单管理",
+		ActionName: "订单列表",
+		Type:       2,
+		ParentId:   orderModule.Id,
+		Sort:       25,
+		Status:     1,
+		AddTime:    int(GetUnix()),
+	}
+	DB.Create(&orderMenu)
+
+	// 给超管分配权限
+	DB.Create(&RoleAccess{RoleId: 1, AccessId: orderModule.Id})
+
+	// 给管理员分配权限
+	DB.Create(&RoleAccess{RoleId: 2, AccessId: orderModule.Id})
+
+	fmt.Println("订单管理模块补种完成")
 }
 
 // seedBuiltinRoles 创建/更新内置角色
@@ -198,6 +243,10 @@ func seedBuiltinAccess() {
 		{TempId: 110, ModuleName: "商户管理", ActionName: "", Type: 1, UrlPrefix: "merchant", HttpMethods: "GET,POST,PUT,DELETE", Sort: 30},
 		{TempId: 111, ModuleName: "商户管理", ActionName: "商户列表", Type: 2, ParentId: 110, Sort: 30},
 		{TempId: 112, ModuleName: "商户管理", ActionName: "增加商户", Type: 2, ParentId: 110, Sort: 29},
+
+		// 订单管理
+		{TempId: 120, ModuleName: "订单管理", ActionName: "", Type: 1, UrlPrefix: "order", HttpMethods: "GET,PUT", Sort: 25},
+		{TempId: 121, ModuleName: "订单管理", ActionName: "订单列表", Type: 2, ParentId: 120, Sort: 25},
 	}
 
 	// 先创建所有 Type=1 的模块组
@@ -268,7 +317,7 @@ func seedAdminPermissions() {
 	}
 
 	// 管理员可访问的模块（排除 manager, role, access）
-	adminPrefixes := []string{"dashboard", "goods", "goodsCate", "goodsType", "goodsTypeAttr", "nav", "focus", "setting", "merchant"}
+	adminPrefixes := []string{"dashboard", "goods", "goodsCate", "goodsType", "goodsTypeAttr", "nav", "focus", "order", "setting", "merchant"}
 	for _, prefix := range adminPrefixes {
 		var access Access
 		DB.Where("url_prefix = ? AND type = 1", prefix).Find(&access)

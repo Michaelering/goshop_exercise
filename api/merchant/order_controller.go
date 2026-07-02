@@ -3,7 +3,6 @@ package merchant
 import (
 	"ginshop58/api/common"
 	"ginshop58/models"
-	"math"
 
 	"github.com/gin-gonic/gin"
 )
@@ -32,9 +31,5 @@ func (con OrderController) Index(c *gin.Context) {
 		models.DB.Where("order_id=?", orderList[i].Id).Find(&orderList[i].OrderItem)
 	}
 
-	totalPages := int(math.Ceil(float64(totalCount) / float64(pageSize)))
-	common.List(c, gin.H{
-		"list":       orderList,
-		"totalPages": totalPages,
-	}, totalCount, page, pageSize)
+	common.List(c, orderList, totalCount, page, pageSize)
 }

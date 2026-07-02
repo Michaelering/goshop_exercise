@@ -214,6 +214,13 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/admin/merchant/MerchantForm.vue'),
         meta: { title: '修改商户' },
       },
+      // 订单管理（管理员）
+      {
+        path: 'order',
+        name: 'AdminOrder',
+        component: () => import('@/views/admin/order/OrderList.vue'),
+        meta: { title: '订单列表' },
+      },
     ],
   },
   {

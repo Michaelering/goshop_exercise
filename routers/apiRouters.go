@@ -114,6 +114,11 @@ func ApiRoutersInit(r *gin.Engine) {
 				adminAuth.DELETE("/merchant/:id", admin.MerchantMgmtController{}.Delete)
 				adminAuth.GET("/merchant/:id", admin.MerchantMgmtController{}.Get)
 
+				// 订单管理（管理员查看/管理全部订单）
+				adminAuth.GET("/order", admin.OrderController{}.Index)
+				adminAuth.GET("/order/:id", admin.OrderController{}.Get)
+				adminAuth.PUT("/order/:id", admin.OrderController{}.Update)
+
 				// 公共修改状态和排序
 				adminAuth.PUT("/changeStatus", admin.DashboardController{}.ChangeStatus)
 				adminAuth.PUT("/changeNum", admin.DashboardController{}.ChangeNum)
