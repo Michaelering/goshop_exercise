@@ -2,13 +2,17 @@ package models
 
 import "fmt"
 
-// RunMigrationAndSeed 执行数据库迁移 + 播种
+// RunMigrationAndSeed 播种内置角色和权限数据
+// 注意：数据库迁移功能已注释，如需重新启用请取消注释 runMigration()
 func RunMigrationAndSeed() {
-	runMigration()
+	// runMigration()
 	SeedBuiltinData()
 }
 
 // runMigration 执行数据库 DDL 迁移，适配新模型字段
+// 迁移完成后会执行数据库修复和清理操作
+// 当前已禁用：如需使用请取消函数首尾注释
+/*
 func runMigration() {
 	// 使用 GORM AutoMigrate 创建新字段（url_prefix, http_methods, parent_id, is_builtin）
 	if err := DB.AutoMigrate(&Role{}, &Access{}); err != nil {
@@ -16,6 +20,11 @@ func runMigration() {
 	}
 
 	migrator := DB.Migrator()
+
+	// ---- access 表：为 parent_id 创建索引（修复慢查询）----
+	if migrator.HasTable(&Access{}) && migrator.HasColumn(&Access{}, "parent_id") {
+		ensureIndex("access", "idx_access_parent_id", "parent_id")
+	}
 
 	// ---- role 表 ----
 	if migrator.HasTable(&Role{}) && migrator.HasColumn(&Role{}, "is_builtin") {
@@ -71,6 +80,7 @@ func runMigration() {
 	// 清理不应该有子项的模块（仪表盘、系统设置只有一个子菜单，冗余）
 	cleanupOrphanChildren()
 }
+*/
 
 // SeedBuiltinData 播种内置角色和权限数据
 func SeedBuiltinData() {
@@ -270,11 +280,16 @@ func seedAdminPermissions() {
 }
 
 // cleanupOrphanChildren 删除单页模块下不应存在的子菜单（旧种子数据残留）
+// 当前已禁用
+/*
 func cleanupOrphanChildren() {
 	DB.Exec("DELETE FROM access WHERE type = 2 AND parent_id IN (SELECT id FROM (SELECT id FROM access WHERE url_prefix IN ('dashboard','setting') AND type = 1) AS tmp)")
 }
+*/
 
 // fixOrphanRoles 给旧自定义角色（有管理员在使用但无任何权限）自动分配管理员权限
+// 当前已禁用
+/*
 func fixOrphanRoles() {
 	// 找出所有被 manager 引用的角色
 	rows, err := DB.Raw("SELECT DISTINCT role_id FROM manager WHERE role_id > 0 AND role_id NOT IN (1, 2)").Rows()
@@ -302,3 +317,22 @@ func fixOrphanRoles() {
 		}
 	}
 }
+*/
+
+// ensureIndex 安全创建索引（如果存在则跳过）
+// 当前已禁用
+/*
+func ensureIndex(table, indexName, column string) {
+	// 检查索引是否已存在
+	var count int64
+	DB.Raw("SELECT COUNT(*) FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = ? AND index_name = ?", table, indexName).Scan(&count)
+	if count == 0 {
+		sql := "CREATE INDEX " + indexName + " ON " + table + " (" + column + ")"
+		if err := DB.Exec(sql).Error; err != nil {
+			fmt.Printf("创建索引 %s 失败（可能已存在）: %v\n", indexName, err)
+		} else {
+			fmt.Printf("索引 %s 创建成功\n", indexName)
+		}
+	}
+}
+*/
