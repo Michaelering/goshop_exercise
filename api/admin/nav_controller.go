@@ -3,7 +3,6 @@ package admin
 import (
 	"ginshop58/api/common"
 	"ginshop58/models"
-	"math"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,11 +18,7 @@ func (con NavController) Index(c *gin.Context) {
 	models.DB.Offset((page - 1) * pageSize).Limit(pageSize).Find(&navList)
 	models.DB.Table("nav").Count(&count)
 
-	totalPages := int(math.Ceil(float64(count) / float64(pageSize)))
-	common.List(c, gin.H{
-		"list":       navList,
-		"totalPages": totalPages,
-	}, count, page, pageSize)
+	common.List(c, navList, count, page, pageSize)
 }
 
 func (con NavController) Create(c *gin.Context) {

@@ -71,8 +71,8 @@ async function loadData() {
   if (!isEdit.value) return
   const id = route.params.id
   const res: any = await api.getNav(Number(id))
-  const item = res.data?.nav
-  if (item) {
+  const item = res.data
+  if (item && item.id) {
     form.title = item.title || ''
     form.link = item.link || ''
     form.position = item.position ?? 2
