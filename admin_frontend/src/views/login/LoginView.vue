@@ -132,6 +132,7 @@ async function handleLogin() {
     }
   } finally {
     loading.value = false
+    form.verifyValue = ''
     loadCaptcha()
   }
 }
